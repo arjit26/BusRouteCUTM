@@ -294,6 +294,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean verifyEmailToken(String verificationToken) {     //This method is typically called when a user clicks on the verification link sent to their email. It ensures that the email verification process is completed, and the user's account is updated accordingly in the database.
+
+        System.out.println("Verifying token: " + verificationToken);
+
+
         Optional<UserInfo> userOptional = userInfoRepository.findByVerificationToken(verificationToken);
         if (userOptional.isPresent()) {
             UserInfo user = userOptional.get();
