@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -23,6 +25,9 @@ public class UserServiceImpl implements UserService {
     private DriverInfoRepository driverInfoRepository;
     private AttendanceInfoRepository attendanceInfoRepository;
 
+   /* @Autowired
+    private PasswordEncoder passwordEncoder;
+*/
     @Autowired
     private JavaMailSender javaMailSender;
 
@@ -78,12 +83,18 @@ public class UserServiceImpl implements UserService {
             return "Sorry,you cannot be registered because bus for your location is not available in our campus";
         }
 
+        //userInfo.setPassword(passwordEncoder.encode(userInfo.getPassword()));
+
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        String encryptedPwD = bCryptPasswordEncoder.encode(userInfo.getPassword());
+        userInfo.setPassword(encryptedPwD);
+
         UserInfo savedUserInfo = userInfoRepository.save(userInfo);
 
         if (savedUserInfo != null) {
 
             // Set the verification token and mark the account as inactive
-            savedUserInfo.setVerificationToken(generateVerificationToken());
+            savedUserInfo.setVerificationToken(userInfo.getVerificationToken());
             savedUserInfo.setEmailVerified(false);
             userInfoRepository.save(savedUserInfo); // Save the user with updated fields
 
@@ -295,8 +306,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean verifyEmailToken(String verificationToken) {     //This method is typically called when a user clicks on the verification link sent to their email. It ensures that the email verification process is completed, and the user's account is updated accordingly in the database.
 
-        System.out.println("Verifying token: " + verificationToken);
-
+//        System.out.println("Verifying token: " + verificationToken);
+//
+//        return true;
 
         Optional<UserInfo> userOptional = userInfoRepository.findByVerificationToken(verificationToken);
         if (userOptional.isPresent()) {
@@ -333,7 +345,7 @@ public class UserServiceImpl implements UserService {
             helper.setSubject("Verify Your Email address");
 
             String verificationLink = "https://localhost:8080/verify-email?token=" + verificationToken;
-            String emailContent = "<p>Click the following link to verify your email:</p>" + "<a href=\"" + verificationLink + "\">Verify Email</a>";
+            String emailContent = "<p>Click the following link to verify your email:</p>" +  verificationLink;
 
             helper.setText(emailContent, true); //  The second parameter is set to true to indicate that the content is in HTML format
             helper.setFrom(senderEmail);    //The setFrom method sets the sender's email address.
@@ -348,3 +360,4 @@ public class UserServiceImpl implements UserService {
 
 }
 
+//"<a href=\"" + verificationLink + "\">Verify Email</a>"

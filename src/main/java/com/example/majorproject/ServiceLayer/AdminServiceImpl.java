@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +23,8 @@ public class AdminServiceImpl implements AdminService{
     private DriverInfoRepository driverInfoRepository;
     private AttendanceInfoRepository attendanceInfoRepository;
 
+    /*@Autowired
+    private PasswordEncoder passwordEncoder;*/
 
     @Autowired
     private JavaMailSender javaMailSender;
@@ -173,6 +177,11 @@ public class AdminServiceImpl implements AdminService{
         userInfo.setVerificationToken(verificationToken);
         userInfo.setEmailVerified(false);
 
+        //userInfo.setPassword(passwordEncoder.encode(userInfo.getPassword()));
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        String addUserEncryptPwd = bCryptPasswordEncoder.encode(userInfo.getPassword());
+        userInfo.setPassword(addUserEncryptPwd);
+
         UserInfo savedUserInfo = userInfoRepository.save(userInfo);
 
         if (savedUserInfo != null) {
@@ -235,6 +244,13 @@ public class AdminServiceImpl implements AdminService{
         if (driverInfo.getPassword().length() < 4) {
             return "Password should be at least 4 characters.";
         }
+
+        //driverInfo.setPassword(passwordEncoder.encode(driverInfo.getPassword()));
+
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        String driverEncryptPwd = bCryptPasswordEncoder.encode(driverInfo.getPassword());
+        driverInfo.setPassword(driverEncryptPwd);
+
         DriverInfo savedDriverInfo = driverInfoRepository.save(driverInfo);
 
         if (savedDriverInfo != null) {

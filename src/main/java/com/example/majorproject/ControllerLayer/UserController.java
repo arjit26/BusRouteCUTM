@@ -151,9 +151,9 @@ public class UserController {
 
 
     @GetMapping("/verify-email")
-    public ResponseEntity<String> verifyEmail(@RequestParam("token") String verificationToken) {
+    public ResponseEntity<String> verifyEmail(@RequestParam("token") String token) {
         // Verify the token and activate the user account
-        if (userService.verifyEmailToken(verificationToken)) {
+        if (userService.verifyEmailToken(token)) {
             return new ResponseEntity<>("Email verification successful. Your account is now active.", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Invalid or expired token. Please try again.", HttpStatus.BAD_REQUEST);

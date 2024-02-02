@@ -3,6 +3,7 @@ package com.example.majorproject.ServiceLayer;
 import com.example.majorproject.*;
 import com.example.majorproject.RqstRes.LoginCredentials;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -44,8 +45,15 @@ public class AuthenticationServiceImpl implements AuthenticationService{
             }
         }
         else if (driverOptional.isPresent()) {
+
+            BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+
+
             DriverInfo driver = driverOptional.get();
-            if (driver.getPassword().equals(loginInfo.getPassword())) {
+
+            if (bCryptPasswordEncoder.matches(loginInfo.getPassword(), driver.getPassword())){
+
+            //if (driver.getPassword().equals(loginInfo.getPassword())) {
                 // Successful login, return admin information
                 return driver;
 
@@ -64,6 +72,9 @@ public class AuthenticationServiceImpl implements AuthenticationService{
 //        }
 
         else if (userOptional.isPresent()) {
+            
+            BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+            
             UserInfo user = userOptional.get();
             if (user.getEmail()==null || user.getPassword()==null){
                 return "Cannot log in. Please enter both email and password.";
@@ -71,7 +82,9 @@ public class AuthenticationServiceImpl implements AuthenticationService{
             //Optional<UserInfo> userInfoOptional = userInfoRepository.findByEmail(user.getEmail());
 //            if (userInfoOptional.isPresent()){
 //                UserInfo userInfo = userInfoOptional.get();
-            else if (user.getPassword().equals(loginInfo.getPassword())){
+
+            else if (bCryptPasswordEncoder.matches(loginInfo.getPassword(), user.getPassword())) {
+                //else if (user.getPassword().equals(loginInfo.getPassword())){
                 if (user.isEmailVerified()){
                     return "Logged In successfully";
                 } else {
