@@ -1,1 +1,1 @@
-This is our On-going Project built with React for the frontend, Spring Boot for the backend, and Node.js for server-side tasks. MySQL serves as the database.
+RouteCUTM is an essential web tool designed for our university's transportation management system. It features a user-friendly interface that allows students and faculty to easily check transport availability and make online payments. The tool also provides critical information, including Bus Pass Numbers and registered bus details, ensuring better control and efficiency in transportation arrangements.
